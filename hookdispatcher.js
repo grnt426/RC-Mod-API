@@ -5,18 +5,19 @@ class HookDispatcher {
         this.KNOWN_HOOKS = ["update"]
         this.fatal = false;
 
-        for(let m in this.KNOWN_MODS){
+        this.KNOWN_MODS.forEach(modjs => {
 
             // while dynamic import is a Promise and failures within the Promise won't bubble out to here,
             // there could be other failures I don't know about and so am defensively guarding against that
             try {
-                import("../../mods/" + m)
+                import("../../mods/" + modjs)
                     .then(mod => {
                         // success. Mod should load itself into window.hooks
+                        window.granite.debug("Successfully loaded " + modjs);
                     })
                     .catch(err => {
                         // ignoring
-                        window.granite.debug("ERROR: Failed to load mod '" + m + "'. Reason: " + err);
+                        window.granite.debug("ERROR: Failed to load mod '" + modjs + "'. Reason: " + err);
                     });
             }
             catch(err) {
@@ -24,7 +25,7 @@ class HookDispatcher {
                 window.granite.debug("FATAL: FAILED IN LOADING MODS. " + err);
                 this.fatal = true;
             }
-        }
+        });
     }
 
     /**

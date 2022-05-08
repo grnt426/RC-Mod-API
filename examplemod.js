@@ -8,5 +8,4 @@ class MyMod {
     }
 }
 
-if(window.mods && Array.isArray(window.mods.hooks))
-    window.mods.hooks.push(new MyMod());
+window.granite.mods.hooks.push(new MyMod());
