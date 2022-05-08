@@ -1,7 +1,7 @@
 class HookDispatcher {
     constructor() {
         this.modHooks = window.granite.mods.hooks;
-        this.KNOWN_MODS = ["../../mods/examplemod.js"];
+        this.KNOWN_MODS = ["examplemod.js"];
         this.KNOWN_HOOKS = ["update"]
         this.fatal = false;
 
@@ -10,7 +10,7 @@ class HookDispatcher {
             // while dynamic import is a Promise and failures within the Promise won't bubble out to here,
             // there could be other failures I don't know about and so am defensively guarding against that
             try {
-                import(m)
+                import("../../mods/" + m)
                     .then(mod => {
                         // success. Mod should load itself into window.hooks
                     })
