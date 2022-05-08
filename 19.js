@@ -1,3 +1,16 @@
+/**
+ * This is a prepared version of the original 19.js file with hooks to export data for mods to use. The original
+ * file was run through a formatter and then had hook points inserted.
+ *
+ * === It is STRONGLY advised to NOT modify this file, or YOU ARE LIKELY TO BREAK MODS. ===
+ *
+ * Original File Date: 05/05/2022
+ *
+ * Important globals
+ *
+ * window.granite - Contains everything for modding
+ */
+
 (window.webpackJsonp = window.webpackJsonp || []).push([[19], {
     626: function(t, e, a) {
         "use strict";
