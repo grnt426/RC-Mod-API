@@ -62,7 +62,7 @@ class HookDispatcher {
                 // If a listener doesn't implement the function, we silently ignore the listener and move on
                 if(fn) {
                     try {
-                        fn(data);
+                        fn.apply(m, [data]);
                     }
                     catch(err) {
                         // We ignore all failures within hook handlers. This isolates failing mods from the rest

@@ -119,12 +119,12 @@
                                 if(granite.readyForUpdates) {
                                     if(granite.heldUpdates) {
                                         granite.heldUpdates.forEach(u => {
-                                            granite.dispatcher.hook(u);
+                                            granite.dispatcher.hook(u, "update");
                                         });
                                         granite.heldUpdates = false;
                                     }
 
-                                    granite.dispatcher.hook(t);
+                                    granite.dispatcher.hook(t, "update");
                                 }
 
                                 // Buffer updates until we are ready to process them.
