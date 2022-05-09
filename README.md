@@ -88,6 +88,3 @@ Future Goals
 Currently, the API only supports one function, and doesn't allow for clients to perform executions on primitives or data
 not exposed through the API. For example, if a mod wanted to change a boolean from true to false, there is no way to
 do that without updating `19.js` itself.
-
-It would be better if instead mods could be scanned for and loaded only if they actually exist, though without access
-to the underlying filesystem this is difficult to do.
