@@ -113,28 +113,27 @@
 
                         // Granite - Incr Update Hook
                         try {
+                            if(window.granite && window.granite.dispatcher) {
 
-                            let granite = y.a.state.granite;
-                            if(!window.granite) {
-                                window.granite = granite;
+                                let granite = y.a.state.granite;
+                                if(granite.readyForUpdates) {
+                                    if(granite.heldUpdates) {
+                                        granite.heldUpdates.forEach(u => {
+                                            granite.dispatcher.hook(u);
+                                        });
+                                        granite.heldUpdates = false;
+                                    }
+
+                                    granite.dispatcher.hook(t);
+                                }
+
+                                // Buffer updates until we are ready to process them.
+                                else {
+                                    if(!granite.heldUpdates)
+                                        granite.heldUpdates = [];
+                                    granite.heldUpdates.push(t);
+                                }
                             }
-
-                            // should store this as a function inside granite so other hook points can use it.
-                            // This will
-                            if(!granite.dispatcher) {
-
-                                // reserve this so the dispatcher has time to set the value
-                                granite.dispatcher = true;
-
-                                // Give space for mods use data as needed
-                                granite.mods = {"hooks":[]};
-
-                                import("./hookdispatcher.js")
-                                    .then(m => { window.granite.debug("Dispatcher hook loaded"); })
-                                    .catch(err => {window.granite.debug("Error loading dispatcher: " + err); });
-                            }
-
-                            d.hook("something", "update");
                         }
                         catch(err) {
                             console.error("ERROR: Something went wrong in processing update: " + err);
@@ -1510,12 +1509,35 @@
                         }
                     }
                     else {
-                        y.a.state.granite = {
+
+                        let state = y.a.state;
+                        state.granite = {
                             url:"http://localhost:8080", awaitingSectorDelay:true, knownSystems:[], keepAlive:0,
                             lastSentSys:"", playerUpdateTime:0, data:t, snapshotTime:0, response:false, sendAllGalacticData:false,
-                            loadedInstance:y.a.state.game.auth.instance, readyForUpdates:false };
+                            loadedInstance:y.a.state.game.auth.instance, readyForUpdates:false
+                        };
 
-                        y.a.state.granite.postData = function(data, type, path = "/update") {
+                        // Make this easily accessible for mod authors
+                        if(!window.granite) {
+                            window.granite = state.granite;
+                        }
+
+                        // Make this easily accessible to mod authors
+                        if(!window.gamestate) {
+                            window.gamestate = state;
+                        }
+
+                        // Give space for mods to use data as needed
+                        granite.mods = {"hooks":[]};
+                        granite.addHookListener = function(listener) {
+                            window.granite.mods.hooks.push(listener);
+                        }
+
+                        import("./hookdispatcher.js")
+                            .then(m => { window.granite.debug("Dispatcher hook loaded"); })
+                            .catch(err => {window.granite.debug("Error loading dispatcher: " + err); });
+
+                        state.granite.postData = function(data, type, path = "/update") {
                             let xhr = new XMLHttpRequest();
                             xhr.open("POST", y.a.state.granite.url + path);
                             xhr.timeout = 2000;
@@ -1523,7 +1545,7 @@
                             xhr.send(JSON.stringify({"type":type, "data":data, "instance":y.a.state.game.auth.instance}));
                         }
 
-                        y.a.state.granite.debug = function(data) {
+                        state.granite.debug = function(data) {
                             let xhr = new XMLHttpRequest();
                             xhr.open("POST", y.a.state.granite.url + "/debug");
                             xhr.timeout = 200;
@@ -1531,19 +1553,19 @@
                             xhr.send(data);
                         }
 
-                        y.a.state.granite.getData = function(callback, query) {
+                        state.granite.getData = function(callback, query) {
                             let xhr = new XMLHttpRequest();
-                            xhr.open("GET", y.a.state.granite.url + query);
+                            xhr.open("GET", state.granite.url + query);
                             xhr.onreadystatechange = function() {
                                 if (xhr.readyState == XMLHttpRequest.DONE) {
-                                    callback(xhr.responseText, y.a.state);
+                                    callback(xhr.responseText, state);
                                 }
                             }
                             xhr.timeout = 2000;
                             xhr.send();
                         }
 
-                        y.a.state.granite.checkGalaxyRequest = function(res, state) {
+                        state.granite.checkGalaxyRequest = function(res, state) {
                             state.granite.response = true;
 
                             // the API /galaxy/id sends TRUE if it finds the data, otherwise false. So, we want to send
@@ -1551,12 +1573,12 @@
                             state.granite.sendAllGalacticData = res ? !(res.toLowerCase() === "true") : false;
                         };
 
-                        y.a.state.granite.debug("Beginning mod loading sequence...");
+                        state.granite.debug("Beginning mod loading sequence...");
 
                         // check if we need to export the entire galaxy, which is expensive
-                        y.a.state.granite.getData(y.a.state.granite.checkGalaxyRequest, "/galaxy/" + y.a.state.game.auth.instance);
+                        state.granite.getData(y.a.state.granite.checkGalaxyRequest, "/galaxy/" + state.game.auth.instance);
 
-                        y.a.state.granite.updater = setInterval(
+                        state.granite.updater = setInterval(
                             function() {
                                 try {
 

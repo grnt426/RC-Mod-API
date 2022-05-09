@@ -4,8 +4,8 @@ class MyMod {
     }
 
     update(update) {
-        window.granite.debug("Hello, World! " + update);
+        // Do something!
     }
 }
 
-window.granite.mods.hooks.push(new MyMod());
+window.granite.addHookListener(new MyMod());
