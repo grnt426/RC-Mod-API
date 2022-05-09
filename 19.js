@@ -113,11 +113,18 @@
 
                         // Granite - Incr Update Hook
                         try {
+
                             let granite = y.a.state.granite;
+                            if(!window.granite) {
+                                window.granite = granite;
+                            }
+
+                            // should store this as a function inside granite so other hook points can use it.
+                            // This will
                             if(!granite.dispatcher) {
 
-                                // Make globally accessible the modding state and utility functions
-                                window.granite = granite;
+                                // reserve this so the dispatcher has time to set the value
+                                granite.dispatcher = true;
 
                                 // Give space for mods use data as needed
                                 granite.mods = {"hooks":[]};

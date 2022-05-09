@@ -1,30 +1,38 @@
+let fs = require("fs");
+
 class HookDispatcher {
     constructor() {
         this.modHooks = window.granite.mods.hooks;
-        this.KNOWN_MODS = ["examplemod.js"];
+        this.KNOWN_MODS = [];
         this.KNOWN_HOOKS = ["update"]
         this.fatal = false;
+        this.SOURCE_DIR = "./dist/main/";
 
-        this.KNOWN_MODS.forEach(modjs => {
+        fs.readdir(this.SOURCE_DIR, (err, files) => {
+            files.forEach(file => {
+                if(file.indexOf("mod.js") !== -1) {
+                    this.KNOWN_MODS.push(file);
 
-            // while dynamic import is a Promise and failures within the Promise won't bubble out to here,
-            // there could be other failures I don't know about and so am defensively guarding against that
-            try {
-                import("./" + modjs)
-                    .then(mod => {
-                        // success. Mod should load itself into window.hooks
-                        window.granite.debug("Successfully loaded " + modjs);
-                    })
-                    .catch(err => {
-                        // ignoring
-                        window.granite.debug("ERROR: Failed to load mod '" + modjs + "'. Reason: " + err);
-                    });
-            }
-            catch(err) {
-                // This should basically be impossible
-                window.granite.debug("FATAL: FAILED IN LOADING MODS. " + err);
-                this.fatal = true;
-            }
+                    // while dynamic import is a Promise and failures within the Promise won't bubble out to here,
+                    // there could be other failures I don't know about and so am defensively guarding against that
+                    try {
+                        import("./" + file)
+                            .then(mod => {
+                                // success. Mod should load itself into window.hooks
+                                window.granite.debug("Successfully loaded " + file);
+                            })
+                            .catch(err => {
+                                // ignoring
+                                window.granite.debug("ERROR: Failed to load mod '" + file + "'. Reason: " + err);
+                            });
+                    }
+                    catch(err) {
+                        // This should basically be impossible
+                        window.granite.debug("FATAL: FAILED IN LOADING MODS. " + err);
+                        this.fatal = true;
+                    }
+                }
+            });
         });
     }
 
