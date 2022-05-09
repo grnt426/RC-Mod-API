@@ -3,15 +3,18 @@ let fs = require("fs");
 class HookDispatcher {
     constructor() {
         this.modHooks = window.granite.mods.hooks;
-        this.KNOWN_MODS = [];
+        this.SCANNED_MODS_FILES = [];
         this.KNOWN_HOOKS = ["update"]
         this.fatal = false;
+
+        // This relative path assumes we are starting from the root directory where the executable is running.
+        // It seems the FS lib starts from the exe rather than where the js file is located on disk.
         this.SOURCE_DIR = "./dist/main/";
 
         fs.readdir(this.SOURCE_DIR, (err, files) => {
             files.forEach(file => {
                 if(file.indexOf("mod.js") !== -1) {
-                    this.KNOWN_MODS.push(file);
+                    this.SCANNED_MODS_FILES.push(file);
 
                     // while dynamic import is a Promise and failures within the Promise won't bubble out to here,
                     // there could be other failures I don't know about and so am defensively guarding against that
