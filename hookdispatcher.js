@@ -66,7 +66,7 @@ class HookDispatcher {
                     }
                     catch(err) {
                         // We ignore all failures within hook handlers. This isolates failing mods from the rest
-                        window.granite.debug("ERROR in dispatching hook for mod " + m + ". " + err);
+                        window.granite.debug("ERROR in dispatching hook for mod " + m.name + ". " + err);
                     }
                 }
             });
