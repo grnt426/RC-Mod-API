@@ -3,6 +3,14 @@ RC Mod API - RCMA
 This is a basic implementation of a modding API that allows mods to register themselves as listeners for events. Those
 events are then sent to all mods that were loaded. Data from the event is passed to the mod for it to process if needed.
 
+# Installation
+## Manual
+Copy `hookdispatcher.js` and `19.js` into the `Rising Constellation/dist/main` directory. You will need to replace your
+existing `19.js` file.
+
+## Vortex
+Vortex is not yet supported, though support is being worked on.
+
 API
 ====
 
