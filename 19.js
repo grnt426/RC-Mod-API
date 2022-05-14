@@ -1546,6 +1546,7 @@
                         }
 
                         state.granite.debug = function(data) {
+                            console.log(data);
                             let xhr = new XMLHttpRequest();
                             xhr.open("POST", y.a.state.granite.url + "/debug");
                             xhr.timeout = 200;
@@ -1588,7 +1589,7 @@
                                         granite.response = false;
 
                                         if(granite.sendAllGalacticData) {
-                                            granite.postData(y.a.state.game.galaxy, "galaxy");
+                                            //granite.postData(y.a.state.game.galaxy, "galaxy");
                                         }
 
                                         granite.sendAllGalacticData = false;
@@ -1602,16 +1603,16 @@
                                     if(granite.awaitingSectorDelay) {
                                         if(y.a.state.game.galaxy.sectors) {
                                             granite.awaitingSectorDelay = false;
-                                            granite.postData(y.a.state.game.galaxy.sectors, "sectors");
-                                            granite.postData(y.a.state.game.player, "player");
+                                            // granite.postData(y.a.state.game.galaxy.sectors, "sectors");
+                                            // granite.postData(y.a.state.game.player, "player");
                                         }
 
                                         let credit = y.a.state.game.player.credit;
                                         let details = credit.details;
-                                        details.rolling = [];
-
-                                        details.rolling.push({"reason":"Hourly", "value": credit.change * 20});
-                                        details.rolling.push({"reason":"Daily", "value": credit.change * 20 * 24});
+                                        // details.rolling = [];
+                                        //
+                                        // details.rolling.push({"reason":"Hourly", "value": credit.change * 20});
+                                        // details.rolling.push({"reason":"Daily", "value": credit.change * 20 * 24});
                                     }
 
                                     if(y.a.state.game.player !== undefined && y.a.state.game.player !== null && y.a.state.game.player.account_id != null) {
@@ -1622,7 +1623,7 @@
                                             if(Date.now() - granite.snapshotTime > 1000) {
                                                 let c = y.a.state.game.galaxy;
                                                 let gal = {rand:Math.random(), "time":c.receivedAt, sectors:c.sectors, stellar_systems:c.stellar_systems, players:c.players};
-                                                granite.postData(gal, "galaxy_snapshot");
+                                                // granite.postData(gal, "galaxy_snapshot");
                                                 granite.snapshotTime = false;
                                             }
                                         }
@@ -1630,7 +1631,7 @@
                                         if(y.a.state.game.selectedSystem != null) {
                                             let sys = y.a.state.game.selectedSystem;
                                             if(granite.lastSentSys !== sys.name) {
-                                                granite.postData(sys, "selectsystem");
+                                                // granite.postData(sys, "selectsystem");
                                                 granite.lastSentSys = sys.name;
                                             }
                                         }
@@ -1638,8 +1639,8 @@
                                             granite.playerUpdateTime += 1;
                                             granite.keepAlive += 1;
 
-                                            if(granite.keepAlive % 100 === 0)
-                                                granite.debug("Keep Alive");
+                                            // if(granite.keepAlive % 100 === 0)
+                                            //     granite.debug("Keep Alive");
                                         }
                                     }
                                     else {
@@ -1647,7 +1648,8 @@
                                     }
                                 }
                                 catch(err) {
-                                    y.a.state.granite.postData(err, "crash");
+                                    console.error("CRASHED: " + err);
+                                    // y.a.state.granite.postData(err, "crash");
                                 }
                             },
                             100
