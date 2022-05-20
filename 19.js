@@ -1670,6 +1670,11 @@
                                     if(j.a.update(), a.mapUpdate) {
                                         e.begin(), a.controls.update();
                                         var s = a.camera.position.z;
+
+                                        // granite get camera
+                                        if(!window.granite.cameraControl)
+                                            window.granite.cameraControl = this;
+
                                         a.blocks.forEach((function(t) {
                                             t.update(), t.animationCallbacks.forEach((function(t) {
                                                 var e = t.far, a = t.near, i = t.cb;
@@ -5045,15 +5050,27 @@
                 }
             }, methods: {
                 sendChatMessage: function() {
-                    var t = this;
-                    this.newChatMessage.length > 0 && this.$socket.faction.push("push_chat_message", {
-                        from: this.player.name,
-                        message: this.newChatMessage
-                    }).receive("ok", (function() {
-                        t.newChatMessage = ""
-                    })).receive("error", (function(e) {
-                        t.$toastError(e.reason)
-                    }))
+
+                    // granite chat message hook
+                    let allowMessageThrough = true;
+                    if(window.granite.dispatcher) {
+                        allowMessageThrough = window.granite.dispatcher.chat(this.newChatMessage);
+                    }
+
+                    if(allowMessageThrough) {
+                        var t = this;
+                        this.newChatMessage.length > 0 && this.$socket.faction.push("push_chat_message", {
+                            from: this.player.name,
+                            message: this.newChatMessage
+                        }).receive("ok", (function() {
+                            t.newChatMessage = ""
+                        })).receive("error", (function(e) {
+                            t.$toastError(e.reason)
+                        }))
+                    }
+                    else {
+                        this.newChatMessage = "";
+                    }
                 }
             }
         }, fa = Object(Ft.a)(ha, (function() {

@@ -22,21 +22,58 @@ class HookDispatcher {
                         import("./" + file)
                             .then(mod => {
                                 // success. Mod should load itself into window.hooks
-                                window.granite.debug("Successfully loaded " + file);
+                                console.debug("Successfully loaded " + file);
                             })
                             .catch(err => {
                                 // ignoring
-                                window.granite.debug("ERROR: Failed to load mod '" + file + "'. Reason: " + err);
+                                console.debug("ERROR: Failed to load mod '" + file + "'. Reason: " + err);
                             });
                     }
                     catch(err) {
                         // This should basically be impossible
-                        window.granite.debug("FATAL: FAILED IN LOADING MODS. " + err);
+                        console.debug("FATAL: FAILED IN LOADING MODS. " + err);
                         this.fatal = true;
                     }
                 }
             });
         });
+    }
+
+    /**
+     * Handles parsing chat messages, which is different from `hook()`. This one allows multiple mods to intercept and
+     * listen for chat commands. If any of the mods processed the message as a command, this will prevent the client
+     * from sending the chat message to everyone else.
+     *
+     * @param message  The Chat object, containing the message to be sent.
+     * @returns {boolean} True if the chat message should be sent as a regular message. False if the message shouldn't
+     * be sent to the server for everyone else to see.
+     */
+    chat(message) {
+
+        // If something terrible happened while trying to load mods, process none of them.
+        if(this.fatal) {
+            return true;
+        }
+
+        let processed = false;
+
+        // Give this chat message to all mods
+        this.modHooks.forEach(m => {
+
+            // If a listener doesn't implement the function, we silently ignore the listener and move on
+            if(m.chatMessage) {
+                try {
+                    processed |= m.chatMessage(message);
+                }
+                catch(err) {
+                    // We ignore all failures within hook handlers. This isolates failing mods from the rest
+                    console.debug("ERROR in dispatching chatMessage for mod " + m.name + ". " + err);
+                }
+            }
+        });
+
+        // If we processed the message, we DON'T want it to get sent, thus we return the inverse.
+        return !processed;
     }
 
     /**
@@ -66,7 +103,7 @@ class HookDispatcher {
                     }
                     catch(err) {
                         // We ignore all failures within hook handlers. This isolates failing mods from the rest
-                        window.granite.debug("ERROR in dispatching hook for mod " + m.name + ". " + err);
+                        console.debug("ERROR in dispatching hook for mod " + m.name + ". " + err);
                     }
                 }
             });
