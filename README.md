@@ -11,9 +11,9 @@ existing `19.js` file.
 ## Vortex
 Vortex is not yet supported, though support is being worked on.
 
-API
-====
+## API
 
+### Update
 `update(data)` - sent whenever the game received an update from the RC server. Things like player updates, navarchs sighted,
  a building finished construction, system explored, etc.
 
@@ -71,6 +71,21 @@ null,"points":1}],"id":2,"name":"Dor-Alnara","owner":null,"points":[[27,29],[21,
 ],[59,59],[59,52],[61,53],[66,46],[63,43],[60,46],[55,48],[51,54],[50,59],[59,61]],"victory_points":2},{"adjacent":[2,5,6,8],"centroid":[42.484,49.593],"division":[{"faction":null,"points":2}],"id":9,"name":"Senteya","owner":null,"points":[[40,54],[42,55],[45,56],[49,63],[51,68],[50,62],[50,59],[51,54],[45,53],
  [44,46],[45,44],[38,38],[35,40],[36,46],[40,54]],"victory_points":1}]},"instance":2705}
 ```
+
+### Chat Message
+`chatMessage(message)` - A string of the chat message the user just sent. If your mod returns `true`, then the chat
+message will be considered a command message and won't be sent to the player's faction in the game. If your mod returns
+`false`, then the message may still be sent to other players, if no other mod returns `true`, either.
+
+An example of how this is used in [Coordinate Jumper Mod](https://github.com/grnt426/RC_Mod_CameraChat):
+
+```text
+c alnori wad
+```
+
+This mod is looking for chat messages similar to this form, where `c` must be at the beginning of the string. The rest
+is interpreted as user input for system and sector name. This mod returns `true` as long as the message at least
+matches one of its known command format types. It will return `true` even if it fails to process the command, thus preventing what it knows is a command, but otherwise bad, from spamming other users.
 
 Mod Format
 ===========
