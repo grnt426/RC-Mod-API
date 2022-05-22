@@ -1673,7 +1673,7 @@
 
                                         // granite get camera
                                         if(!window.granite.cameraControl)
-                                            window.granite.cameraControl = this;
+                                            window.granite.cameraControl = a;
 
                                         a.blocks.forEach((function(t) {
                                             t.update(), t.animationCallbacks.forEach((function(t) {
