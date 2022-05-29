@@ -11,6 +11,10 @@ class HookDispatcher {
         // It seems the FS lib starts from the exe rather than where the js file is located on disk.
         this.SOURCE_DIR = "./dist/main/";
 
+        this.#setupLogging(this.SOURCE_DIR);
+
+        // Load the mods last, after we have prepared everything else, so they can use any APIs that might need to be
+        // instantiated first
         fs.readdir(this.SOURCE_DIR, (err, files) => {
             files.forEach(file => {
                 if(file.indexOf("mod.js") !== -1) {
@@ -22,21 +26,40 @@ class HookDispatcher {
                         import("./" + file)
                             .then(mod => {
                                 // success. Mod should load itself into window.hooks
-                                console.debug("Successfully loaded " + file);
+                                window.granite.debug("Successfully loaded " + file);
                             })
                             .catch(err => {
                                 // ignoring
-                                console.debug("ERROR: Failed to load mod '" + file + "'. Reason: " + err);
+                                window.granite.debug(
+                                    "ERROR: Failed to load mod '" + file + "'. Reason: " + err,
+                                    window.granite.levels.ERROR);
                             });
                     }
                     catch(err) {
                         // This should basically be impossible
-                        console.debug("FATAL: FAILED IN LOADING MODS. " + err);
+                        window.granite.debug("FATAL: FAILED IN LOADING MODS. " + err, window.granite.levels.ERROR);
                         this.fatal = true;
                     }
                 }
             });
         });
+    }
+
+    #setupLogging(dir) {
+        this.logFileLoc = dir + "rc_mod.log";
+
+        this.logFile = false;
+        fs.open(this.logFileLoc, "a+", (err, f) => {
+            if(err) {
+                window.console.error("Failed to open log file: " + err);
+            }
+            else {
+                this.logFile = f;
+            }
+        });
+
+        window.granite.levels = {DEBUG:"debug", INFO:"info", ERROR:"error"};
+        window.granite.debug = this.#debug;
     }
 
     /**
@@ -66,8 +89,12 @@ class HookDispatcher {
                     processed |= m.chatMessage(message);
                 }
                 catch(err) {
+
                     // We ignore all failures within hook handlers. This isolates failing mods from the rest
-                    console.debug("ERROR in dispatching chatMessage for mod " + m.name + ". " + err);
+                    window.granite.debug(
+                        "ERROR in dispatching chatMessage for mod " + m.name + ". " + err,
+                        window.granite.levels.ERROR
+                    );
                 }
             }
         });
@@ -103,8 +130,38 @@ class HookDispatcher {
                     }
                     catch(err) {
                         // We ignore all failures within hook handlers. This isolates failing mods from the rest
-                        console.debug("ERROR in dispatching hook for mod " + m.name + ". " + err);
+                        window.granite.debug(
+                            "ERROR in dispatching hook for mod " + m.name + ". " + err,
+                            window.granite.levels.ERROR
+                        );
                     }
+                }
+            });
+        }
+    }
+
+    /**
+     * Splits messages to both a log file and the console, at the appropriate log level.
+     * @param message   The string to be logged to console and log file.
+     * @param level     The level to log at. DEBUG, INFO, or ERROR.
+     */
+    #debug(message, level=window.granite.levels.INFO) {
+        let levelString = " [INFO] ";
+        let func = window.console.info;
+        let log = new Date().toISOString() + levelString + message;
+
+        switch(level) {
+            case window.granite.levels.DEBUG: func = window.console.debug; levelString = " [DEBUG] "; break;
+            case window.granite.levels.ERROR: func = window.console.error; levelString = " [ERROR] "; break;
+            default: window.console.error("Unknown type in parsing logging level : " + level);
+        }
+
+        func(message);
+
+        if(this.logFile) {
+            fs.write(this.logFile, log, err => {
+                if(err) {
+                    window.console.error("Failed in writing to logfile! " + err);
                 }
             });
         }

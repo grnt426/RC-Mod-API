@@ -1,7 +1,7 @@
 class MyMod {
     constructor() {
         this.hello = 1;
-        console.log("Example mod has loaded!");
+        window.granite.debug("Example mod has loaded! " + this.hello);
     }
 
     update(update) {

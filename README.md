@@ -11,7 +11,7 @@ existing `19.js` file.
 ## Vortex
 Vortex is not yet supported, though support is being worked on.
 
-## API
+## Hook API
 
 ### Update
 `update(data)` - sent whenever the game received an update from the RC server. Things like player updates, navarchs sighted,
@@ -86,6 +86,20 @@ c alnori wad
 This mod is looking for chat messages similar to this form, where `c` must be at the beginning of the string. The rest
 is interpreted as user input for system and sector name. This mod returns `true` as long as the message at least
 matches one of its known command format types. It will return `true` even if it fails to process the command, thus preventing what it knows is a command, but otherwise bad, from spamming other users.
+
+## Utility API
+
+All the below are found within the global object `window.granite`. They are generally available and ready to use as soon as your mod object is initialized (meaning, within the mod's constructor).
+
+## Debug
+`window.granite.debug(message, level=INFO)` - If possible, will write log information to a log file, `rc_mod.log`,
+inside the main directory. 
+
+`level`, if set, may be anything within the `window.granite.levels` map, such as DEBUG, INFO, or ERROR.
+
+## Levels
+`window.granite.levels` - a mapping of logger levels to use. DEBUG, INFO, or ERROR. For use in the Debug utility
+function.
 
 Mod Format
 ===========
