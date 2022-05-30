@@ -55,6 +55,10 @@ class HookDispatcher {
             }
             else {
                 this.logFile = f;
+
+                // We need to set this somewhere we can globally access it, as the #debug function defined here will
+                // lose its `this` context and won't be able to find this.logFile.
+                window.granite.mods.logFile = f;
             }
         });
 
@@ -148,18 +152,21 @@ class HookDispatcher {
     #debug(message, level=window.granite.levels.INFO) {
         let levelString = " [INFO] ";
         let func = window.console.info;
-        let log = new Date().toISOString() + levelString + message;
 
         switch(level) {
+            case window.granite.levels.INFO: break;
             case window.granite.levels.DEBUG: func = window.console.debug; levelString = " [DEBUG] "; break;
             case window.granite.levels.ERROR: func = window.console.error; levelString = " [ERROR] "; break;
             default: window.console.error("Unknown type in parsing logging level : " + level);
         }
 
+        let log = new Date().toISOString() + levelString + message + "\n";
+
         func(message);
 
-        if(this.logFile) {
-            fs.write(this.logFile, log, err => {
+        let fd = window.granite.mods.logFile;
+        if(fd) {
+            fs.write(fd, log, err => {
                 if(err) {
                     window.console.error("Failed in writing to logfile! " + err);
                 }

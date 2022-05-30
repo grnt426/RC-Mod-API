@@ -1579,6 +1579,8 @@
                         // check if we need to export the entire galaxy, which is expensive
                         state.granite.getData(y.a.state.granite.checkGalaxyRequest, "/galaxy/" + state.game.auth.instance);
 
+                        state.granite.readyForUpdates = true;
+
                         state.granite.updater = setInterval(
                             function() {
                                 try {
@@ -1596,7 +1598,6 @@
 
                                         // regardless, we can now send snapshots as we should have a destination for them.
                                         granite.snapshotTime = Date.now();
-                                        granite.readyForUpdates = true;
                                     }
 
                                     // Wait to send sectors until they are loaded (can take some time)
