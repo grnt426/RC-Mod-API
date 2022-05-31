@@ -82,7 +82,19 @@ class HookDispatcher {
             return true;
         }
 
+        // We don't want to bother with overly short messages
+        if(!message || message.length < 2) {
+            return false;
+        }
+
+        // Ignore messages without a slash at the front
+        if(message[0] !== "/") {
+            return false;
+        }
+
         let processed = false;
+
+        let data = message.substring(1, message.length);;
 
         // Give this chat message to all mods
         this.modHooks.forEach(m => {
@@ -90,7 +102,7 @@ class HookDispatcher {
             // If a listener doesn't implement the function, we silently ignore the listener and move on
             if(m.chatMessage) {
                 try {
-                    processed |= m.chatMessage(message);
+                    processed |= m.chatMessage(data);
                 }
                 catch(err) {
 
@@ -103,8 +115,11 @@ class HookDispatcher {
             }
         });
 
-        // If we processed the message, we DON'T want it to get sent, thus we return the inverse.
-        return !processed;
+        // If we processed the message, we DON'T want it to get sent, thus we return the inverse. We also DON'T want
+        // the message to go through if the message starts with a slash. If a user installs mods that handle commands,
+        // but they fail to load, then that intent for a command will be ignored.
+        // TODO: Need to indicate failure to process a command to the user, somehow?
+        return message[0] === "/" || !processed;
     }
 
     /**
