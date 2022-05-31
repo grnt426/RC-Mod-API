@@ -84,12 +84,12 @@ class HookDispatcher {
 
         // We don't want to bother with overly short messages
         if(!message || message.length < 2) {
-            return false;
+            return true;
         }
 
         // Ignore messages without a slash at the front
         if(message[0] !== "/") {
-            return false;
+            return true;
         }
 
         let processed = false;
@@ -119,7 +119,7 @@ class HookDispatcher {
         // the message to go through if the message starts with a slash. If a user installs mods that handle commands,
         // but they fail to load, then that intent for a command will be ignored.
         // TODO: Need to indicate failure to process a command to the user, somehow?
-        return message[0] === "/" || !processed;
+        return message[0] !== "/" || !processed;
     }
 
     /**
