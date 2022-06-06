@@ -1185,6 +1185,8 @@
             }, {
                 key: "showMovingCharacters", value: function() {
                     var t = this, e = [], a = y.a.state.game.player.characters.reduce((function(a, s) {
+
+                        // GRANITE show moving characters
                         if("on_board" !== s.status) return a;
                         var i = s.actions.queue.filter((function(t) {
                             return "jump" === t.type
@@ -1326,7 +1328,11 @@
                 }
             }, {
                 key: "hoverPathTo", value: function(t) {
+
+                    // granite - creates hover paths
                     var e = this.getSelected(), a = this.getPosition(e);
+
+                    // a: system ID of start. t: selected system object
                     if(a !== t.id) {
                         this.displayedTravelPath = this.computePath(a, t.id);
                         var s = this.displayedTravelPath.reduce((function(t, e) {
@@ -1571,7 +1577,7 @@
 
                             // the API /galaxy/id sends TRUE if it finds the data, otherwise false. So, we want to send
                             // galaxy data only if we get back FALSE, with care taken to not respond on empty responses.
-                            state.granite.sendAllGalacticData = res ? !(res.toLowerCase() === "true") : false;
+                            state.granite.sendAllGalacticData = res ? true : !(res.toLowerCase() === "true");
                         };
 
                         state.granite.debug("Beginning mod loading sequence...");
@@ -1657,8 +1663,10 @@
                         );
                     }
 
+
+
                     var e, a = this;
-                    return c.a.wrap((function(t) {
+                    let returnable = c.a.wrap((function(t) {
                         for(; ;) switch(t.prev = t.next) {
                             case 0:
                                 return e = {
@@ -1688,7 +1696,12 @@
                             case"end":
                                 return t.stop()
                         }
-                    }), t, this)
+                    }), t, this);
+
+                    // Let the mods know the game is probably loaded by this point and may do work.
+                    window.granite.dispatcher.gameLoaded();
+
+                    return returnable;
                 }))), function() {
                     return a.apply(this, arguments)
                 })

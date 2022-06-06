@@ -66,6 +66,31 @@ class HookDispatcher {
         window.granite.debug = this.#debug;
     }
 
+    gameLoaded() {
+        if(this.fatal) {
+            return;
+        }
+
+        this.modHooks.forEach(m => {
+            if(m.gameLoaded) {
+                try {
+                    m.gameLoaded();
+                }
+                catch(err) {
+                    // We ignore all failures within hook handlers. This isolates failing mods from the rest
+                    window.granite.debug(
+                        "ERROR in dispatching gameLoaded for mod " + this.#getModName(m) + ". " + err,
+                        window.granite.levels.ERROR
+                    );
+                }
+            }
+        });
+    }
+
+    #getModName(mod) {
+        return mod.name ? mod.name : mod;
+    }
+
     /**
      * Handles parsing chat messages, which is different from `hook()`. This one allows multiple mods to intercept and
      * listen for chat commands. If any of the mods processed the message as a command, this will prevent the client
@@ -94,7 +119,7 @@ class HookDispatcher {
 
         let processed = false;
 
-        let data = message.substring(1, message.length);;
+        let data = message.substring(1, message.length);
 
         // Give this chat message to all mods
         this.modHooks.forEach(m => {
@@ -108,7 +133,7 @@ class HookDispatcher {
 
                     // We ignore all failures within hook handlers. This isolates failing mods from the rest
                     window.granite.debug(
-                        "ERROR in dispatching chatMessage for mod " + m.name + ". " + err,
+                        "ERROR in dispatching chatMessage for mod " + this.#getModName(m) + ". " + err,
                         window.granite.levels.ERROR
                     );
                 }
@@ -150,7 +175,7 @@ class HookDispatcher {
                     catch(err) {
                         // We ignore all failures within hook handlers. This isolates failing mods from the rest
                         window.granite.debug(
-                            "ERROR in dispatching hook for mod " + m.name + ". " + err,
+                            "ERROR in dispatching hook for mod " + this.#getModName(m) + ". " + err,
                             window.granite.levels.ERROR
                         );
                     }
