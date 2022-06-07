@@ -1504,6 +1504,17 @@
 
                         // If they switched game instances, then we need to reset some state.
                         if(y.a.state.granite.loadedInstance !== y.a.state.game.auth.instance) {
+
+                            Object.values(window.granite.mods.hooks).forEach(l =>  {
+                                try {
+                                    if(l.gameLoaded)
+                                        l.gameLoaded();
+                                }
+                                catch(err) {
+                                    window.granite.debug("ERROR: Failure in calling `gameLoaded` for " + l.name + ": " + err, window.granite.levels.ERROR);
+                                }
+                            });
+
                             y.a.state.granite.debug("Different instance. Loading diff.");
                             let prevData = y.a.state.granite;
                             prevData.snapshotTime = false;
@@ -1537,6 +1548,13 @@
                         granite.mods = {"hooks":[]};
                         granite.addHookListener = function(listener) {
                             window.granite.mods.hooks.push(listener);
+                            try {
+                                if(listener.gameLoaded)
+                                    listener.gameLoaded();
+                            }
+                            catch(err) {
+                                window.granite.debug("ERROR: Failure in calling `gameLoaded` for " + listener.name + ": " + err, window.granite.levels.ERROR);
+                            }
                         }
 
                         import("./hookdispatcher.js")
@@ -1666,7 +1684,7 @@
 
 
                     var e, a = this;
-                    let returnable = c.a.wrap((function(t) {
+                    return c.a.wrap((function(t) {
                         for(; ;) switch(t.prev = t.next) {
                             case 0:
                                 return e = {
@@ -1697,11 +1715,6 @@
                                 return t.stop()
                         }
                     }), t, this);
-
-                    // Let the mods know the game is probably loaded by this point and may do work.
-                    window.granite.dispatcher.gameLoaded();
-
-                    return returnable;
                 }))), function() {
                     return a.apply(this, arguments)
                 })

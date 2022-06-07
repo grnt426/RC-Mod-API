@@ -67,7 +67,9 @@ class HookDispatcher {
     }
 
     gameLoaded() {
+        window.granite.debug("Game loaded! Letting mods do setup work.");
         if(this.fatal) {
+            window.granite.debug("FATAL detected; ignoring gameLoaded hook.", window.granite.levels.DEBUG);
             return;
         }
 
