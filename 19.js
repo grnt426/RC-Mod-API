@@ -1557,6 +1557,27 @@
                             }
                         }
 
+                        /**
+                         * Mods can put messages in the chat for only the current player to see. They are *not* saved
+                         * when the game is closed.
+                         * @param from      Who the message should be "from". Mods should be their name for this field.
+                         * @param message   The message content for the user.
+                         */
+                        granite.showMessageInChat = function(from, message) {
+                            if(from && message) {
+                                let name = document.createElement("strong");
+                                name.textContent = from;
+                                let message = document.createElement("div");
+                                message.classList.add("chat-message");
+                                message.textContent = " " + text + " ";
+                                message.prepend(name);
+                                $(".chat-messages").prepend(message);
+                            }
+                            else {
+                                window.granite.debug("From/Message can't be empty: " + from +  " " + message + ". Some mod did this....", window.granite.levels.ERROR);
+                            }
+                        }
+
                         import("./hookdispatcher.js")
                             .then(m => { window.granite.debug("Dispatcher hook loaded"); })
                             .catch(err => {window.granite.debug("Error loading dispatcher: " + err); });

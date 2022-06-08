@@ -91,15 +91,24 @@ matches one of its known command format types. It will return `true` even if it 
 
 All the below are found within the global object `window.granite`. They are generally available and ready to use as soon as your mod object is initialized (meaning, within the mod's constructor).
 
-## Debug
+### Debug
 `window.granite.debug(message, level=INFO)` - If possible, will write log information to a log file, `rc_mod.log`,
 inside the main directory. 
 
-`level`, if set, may be anything within the `window.granite.levels` map, such as DEBUG, INFO, or ERROR.
+**Parameters**:
+* `message` - what to log
+* `level` - if set, may be anything within the `window.granite.levels` map, such as DEBUG, INFO, or ERROR.
 
-## Levels
+### Levels
 `window.granite.levels` - a mapping of logger levels to use. DEBUG, INFO, or ERROR. For use in the Debug utility
 function.
+
+### Show Message in Chat
+`window.granite.showMessageInChat(from, message)` - Mods can put messages in the chat for only the current player to see. They are *not* saved when the game is closed.
+
+**Parameters**:
+* `from` - Who the message should be "from". Mods should be their name for this field.
+* `message` - The message content for the user.
 
 Mod Format
 ===========
