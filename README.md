@@ -87,9 +87,18 @@ This mod is looking for chat messages similar to this form, where `c` must be at
 is interpreted as user input for system and sector name. This mod returns `true` as long as the message at least
 matches one of its known command format types. It will return `true` even if it fails to process the command, thus preventing what it knows is a command, but otherwise bad, from spamming other users.
 
+## Game Data
+This is data exposed for easy access at the global level for modders to use. CAUTION must be taken when editing anything in these objects, as it WILL affect the game as the player sees it.
+
+### Game
+`window.gamestate.game` - Most of the game's high level representation of the state of the application. Things like the player's systems, agents, galaxy, blackholes, time, and much more is stored in here.
+
 ## Utility API
 
 All the below are found within the global object `window.granite`. They are generally available and ready to use as soon as your mod object is initialized (meaning, within the mod's constructor).
+
+### Add Hook Listener
+`window.granite.addHookListener(Object)` - Registers this object to receive API calls, such as those listed above in this README. NOTE: an Object does not need to have all the APIs implemented to be valid. Any APIs that are implemented will be called and safely wrapped in try/catch to prevent errors escaping.
 
 ### Debug
 `window.granite.debug(message, level=INFO)` - If possible, will write log information to a log file, `rc_mod.log`,
