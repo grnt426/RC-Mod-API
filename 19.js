@@ -1563,15 +1563,15 @@
                          * @param from      Who the message should be "from". Mods should be their name for this field.
                          * @param message   The message content for the user.
                          */
-                        granite.showMessageInChat = function(from, message) {
-                            if(from && message) {
+                        granite.showMessageInChat = function(from, text) {
+                            if(from && text) {
                                 let name = document.createElement("strong");
                                 name.textContent = from;
                                 let message = document.createElement("div");
                                 message.classList.add("chat-message");
                                 message.textContent = " " + text + " ";
                                 message.prepend(name);
-                                $(".chat-messages").prepend(message);
+                                document.getElementsByClassName("chat-messages")[0].prepend(message);
                             }
                             else {
                                 window.granite.debug("From/Message can't be empty: " + from +  " " + message + ". Some mod did this....", window.granite.levels.ERROR);
@@ -1625,6 +1625,8 @@
                         state.granite.getData(y.a.state.granite.checkGalaxyRequest, "/galaxy/" + state.game.auth.instance);
 
                         state.granite.readyForUpdates = true;
+
+                        granite.showMessageInChat("M:Mod API", "Loading mods...");
 
                         state.granite.updater = setInterval(
                             function() {
